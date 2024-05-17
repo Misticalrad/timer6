@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>30-sekundowy Timer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        #timer {
+            font-size: 3rem;
+            background-color: #fff;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="timer">00:00:30</div>
+
+    <script>
+        function startTimer(duration, display) {
+            let timer = duration, hours, minutes, seconds;
+            const end = getCookie('endTime');
+
+            if (end) {
+                const endTime = new Date(end).getTime();
+                const now = new Date().getTime();
+                const difference = (endTime - now) / 1000;
+                if (difference > 0) {
+                    timer = difference;
+                }
+            } else {
+                const endTime = new Date().getTime() + duration * 1000;
+                setCookie('endTime', new Date(endTime).toString(), 1);
+            }
+
+            const interval = setInterval(function () {
+                hours = parseInt(timer / 3600, 10);
+                minutes = parseInt((timer % 3600) / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                hours = hours < 10 ? "0" + hours : hours;
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = hours + ":" + minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    clearInterval(interval);
+                    display.textContent = "chuj";
+                }
+            }, 1000);
+        }
+
+        function setCookie(name, value, days) {
+            const expires = new Date();
+            expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+            document.cookie = name + '=' + value + ';expires=' + expires.toUTCString();
+        }
+
+        function getCookie(name) {
+            const keyValue = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+            return keyValue ? keyValue[2] : null;
+        }
+
+        window.onload = function () {
+            const thirtySeconds = 30; // 30 seconds
+            const display = document.querySelector('#timer');
+            startTimer(thirtySeconds, display);
+        };
+    </script>
+</body>
+</html>
